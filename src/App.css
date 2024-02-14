@@ -1,0 +1,15 @@
+.App {
+  padding: 20px 10px;
+}
+.app-holder{max-width: 500px; margin: 0 auto;}
+.todolist-container{padding: 20px 10px;} 
+ul{margin: 0;}
+li{padding-top: 10px; display: flex; padding: 10px 10px;}
+li .card{
+  width: 100%;
+  padding: 10px 0;margin: 15px 0;
+  box-shadow: 2px 2px 4px #c1c1c1;
+}
+ul{padding: 0;}
+li > div i{padding-right: 10px;}
+.task-holder,.list-holder{max-width: 600px; margin: 0 auto; padding: 20px 0;}
