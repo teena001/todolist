@@ -25,7 +25,7 @@ class TodoLists extends Component {
         }
       {
          todoLists.length < 1 &&
-         <div>No Items to Show</div>
+         <div className='holder'>No Items to Show</div>
       }
         
       </ul>

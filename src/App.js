@@ -47,7 +47,8 @@ export class App extends Component {
   clearList =() =>{
     this.setState({
       todoLists:[],
-      task:""
+      task:"",
+      taskEdited:false
     })
   }
 

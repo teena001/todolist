@@ -12,4 +12,6 @@ li .card{
 }
 ul{padding: 0;}
 li > div i{padding-right: 10px;}
+li > div span{cursor: pointer;}
+.holder{padding: 20px 0; text-align: center; font-weight: bold;}
 .task-holder,.list-holder{max-width: 600px; margin: 0 auto; padding: 20px 0;}
