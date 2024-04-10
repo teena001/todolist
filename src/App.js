@@ -1,98 +1,150 @@
-import React, { Component } from 'react'
-import TodoLists from './components/TodoLists'
-import 'bootstrap/dist/css/bootstrap.min.css'
-import TodoInput from './components/TodoInput';
-import './App.css';
+import React, { Component } from 'react' 
+import 'bootstrap/dist/css/bootstrap.min.css' 
+import './App.css'; 
+import TodoLists from './components/todoList/TodoLists';
+import TodoForm from './components/todoList/TodoForm';
+import EditTodoItem from './components/todoList/EditTodoItem';
 //import uuid from "uuid"
 
 export class App extends Component {
-  state = {
-    todoLists : [],
-    id:1,
-    task:"",
-    taskEdited: false
+  state = { 
+    data: [],
+    loading: false,
+    value: "",
+    editing: false,
+    currentid: "",
+    currentValue: ""
+    
   }
+
+  
+  fetchData = async () => {
+    try {
+      const resp = await fetch('https://jsonplaceholder.typicode.com/todos');
+      const userData  = await resp.json();
+      this.setState({
+        data: userData,
+        loading: true
+    });
+
+
+    } catch (error) {
+      console.log("error fetching data" ,error)
+    }
+  }
+
+  
+  componentDidMount(){
+    this.fetchData() 
+  }
+  
 
   onChange =(e)=>{
     this.setState({
-      task:e.target.value
+      value:e.target.value
     })
-  }
+  } 
+  
 
-  onSubmit = (e) => {
+  handleSubmit = (e) => {
     e.preventDefault();
-
-    if(!this.state.task.length){
-      return;
+    const newTask = {
+      title : this.state.value,
+      id: Date.now()
     }
 
+    if(this.state.value !== "") {
+      this.setState({
+        data: this.state.data.concat(newTask)
+      });
+      this.setState({value:""})
 
-    const newItem= {
-      id:this.state.id,
-      task: this.state.task
     }
-
-    //console.log(newItem)
-    const updatedItems = [...this.state.todoLists, newItem]
-
-    this.setState({
-      todoLists:updatedItems,
-      task:"",
-      id:this.state.id+1,
-      taskEdited:false
-    });
-
   }
 
+  
   clearList =() =>{
     this.setState({
-      todoLists:[],
-      task:"",
-      taskEdited:false
+      data:[]
     })
   }
 
   onDelete = (taskId) => {
-    const deletedItem = this.state.todoLists.filter(task => task.id !== taskId)
+    const deletedItem = this.state.data.filter(task => task.id !== taskId)
     this.setState({
-      todoLists:deletedItem, 
-      id:this.state.id 
+      data:deletedItem
     })
 
   }
 
-  onEdit =(taskId) =>{
+  onEdit =(todoItem) =>{
     
-    const filteredItems = this.state.todoLists.filter(task => task.id !== taskId);
+    this.setState({ editing: true })
+    this.setState({ currentid: todoItem.id })
+    this.setState({ currentValue: todoItem.title }) 
+    }
 
-    const selectedItem = this.state.todoLists.find(task => task.id === taskId);
-
+    
+  onEditChange = (e) => {
     this.setState({
-      todoLists:filteredItems,
-      task:selectedItem.task,
-      taskEdited: true,
-      id:taskId
-    }); 
+      currentValue: e.target.value
+    })
   }
+  onEditSubmit = (e) => {
+    
+    e.preventDefault();
+    this.onEditTodo(this.state.currentid, this.state.currentValue);
+    this.setState({editing:false})
+  }
+
+  onEditTodo = (id, newValue) => {
+    this.state.data.map(todo => {
+      if(todo.id === id) {
+        todo.title = newValue
+      }
+    })
+  }
+
  
   render() {
-    
+    const {data, loading, editing} = this.state;
+
+    if (!loading)
+            return (
+                <div>
+                    <h1> Please wait some time.... </h1>
+                </div>
+            );
 
     return (
-      <div className='container'>
-        <TodoInput 
-        onSubmit = {this.onSubmit}
-        onChange={this.onChange} 
-        task={this.state.task}
-        taskEdited={this.state.taskEdited}
-        />
-        <TodoLists 
-        todoLists={this.state.todoLists} 
-        clearList={this.clearList} 
-        onDelete={this.onDelete} 
-        onEdit = {this.onEdit}
+      <div className='container'> 
+          {this.state.editing === false ?
+
+          (
+            <TodoForm 
+              value={this.state.value}
+              handleSubmit ={this.handleSubmit} 
+              onChange={this.onChange}
+            />
+
+          )
+          :
+          <EditTodoItem 
+            value={this.state.currentValue} 
+            onEditChange={this.onEditChange} 
+            onEditSubmit={this.onEditSubmit}
+          />
+
+          }
         
-        /> 
+
+        <TodoLists 
+          data={data} 
+          clearList={this.clearList} 
+          onDelete={this.onDelete} 
+          onEdit={this.onEdit} 
+          editing={editing}
+        />
 
       </div>
     )
